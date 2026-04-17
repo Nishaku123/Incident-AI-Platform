@@ -1,0 +1,30 @@
+[
+  {
+    "timestamp": "2026-01-17T10:40:00Z",
+    "severity": "critical",
+    "service": "api-gateway",
+    "alert": "Checkout p95 latency > 2500ms",
+    "description": "Public checkout latency crossed threshold for 5 minutes"
+  },
+  {
+    "timestamp": "2026-01-17T10:41:00Z",
+    "severity": "critical",
+    "service": "payments",
+    "alert": "HTTP 5xx rate > 15%",
+    "description": "Payment charge endpoint failing"
+  },
+  {
+    "timestamp": "2026-01-17T10:41:30Z",
+    "severity": "high",
+    "service": "cart",
+    "alert": "Redis dependency latency high",
+    "description": "Cart reads to redis-cache exceeded 800ms"
+  },
+  {
+    "timestamp": "2026-01-17T10:42:00Z",
+    "severity": "high",
+    "service": "redis-cache",
+    "alert": "Replication lag > 20s",
+    "description": "Primary cache node reports replication lag and blocked clients"
+  }
+]

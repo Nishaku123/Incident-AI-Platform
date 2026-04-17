@@ -1,0 +1,10 @@
+2026-01-17T10:37:12Z INFO request_id=gw-1001 route=/health status=200 latency_ms=18
+2026-01-17T10:38:55Z INFO request_id=gw-1002 route=/checkout status=200 latency_ms=240 upstream=payments
+2026-01-17T10:39:05Z WARN request_id=gw-1003 route=/checkout latency_ms=610 upstream=cart message="upstream response slow"
+2026-01-17T10:39:58Z WARN request_id=gw-1004 route=/checkout latency_ms=2210 upstream=payments message="client nearing timeout"
+2026-01-17T10:40:18Z ERROR request_id=gw-1005 route=/checkout status=504 upstream=payments latency_ms=3001 message="upstream timeout"
+2026-01-17T10:41:11Z ERROR request_id=gw-1006 route=/checkout status=504 upstream=payments latency_ms=3000 message="upstream timeout"
+2026-01-17T10:42:04Z ERROR request_id=gw-1007 route=/checkout status=502 upstream=payments latency_ms=2910 message="payment path failed"
+2026-01-17T10:43:12Z WARN request_id=gw-1008 route=/checkout status=200 latency_ms=1700 upstream=payments message="recovered but degraded"
+2026-01-17T10:44:18Z INFO request_id=gw-1009 route=/checkout status=200 latency_ms=920 upstream=payments
+2026-01-17T10:45:09Z INFO request_id=gw-1010 route=/checkout status=200 latency_ms=260 upstream=payments

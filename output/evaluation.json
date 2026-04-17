@@ -1,0 +1,20 @@
+{
+  "steps": [
+    "Ingest",
+    "Index Evidence",
+    "Triage",
+    "Investigate",
+    "Hypothesize",
+    "Verify",
+    "Report"
+  ],
+  "metrics": {
+    "service_match": 1.0,
+    "severity_match": 1.0,
+    "start_time_match": 1.0,
+    "timeline_accuracy": 1.0,
+    "evidence_coverage": 1.0,
+    "hallucination_rate": 0.0,
+    "tool_call_correctness": 1.0
+  }
+}

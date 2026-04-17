@@ -1,0 +1,10 @@
+2026-01-17T10:37:00Z INFO node=redis-primary blocked_clients=0 replication_lag_s=0 cpu_pct=42
+2026-01-17T10:38:45Z INFO node=redis-primary blocked_clients=1 replication_lag_s=1 cpu_pct=46
+2026-01-17T10:39:01Z WARN node=redis-primary blocked_clients=21 replication_lag_s=8 cpu_pct=79 message="background save started"
+2026-01-17T10:39:39Z WARN node=redis-primary blocked_clients=48 replication_lag_s=15 cpu_pct=88 message="disk I/O saturation during bgsave"
+2026-01-17T10:40:06Z ERROR node=redis-primary blocked_clients=72 replication_lag_s=24 cpu_pct=92 message="command processing stalled"
+2026-01-17T10:40:44Z ERROR node=redis-primary blocked_clients=81 replication_lag_s=27 cpu_pct=94 message="fork for bgsave delayed clients"
+2026-01-17T10:41:33Z ERROR node=redis-primary blocked_clients=89 replication_lag_s=31 cpu_pct=95 message="disk I/O saturation persists"
+2026-01-17T10:42:18Z ERROR node=redis-primary blocked_clients=76 replication_lag_s=28 cpu_pct=93 message="client timeout pressure"
+2026-01-17T10:43:40Z WARN node=redis-primary blocked_clients=18 replication_lag_s=7 cpu_pct=71 message="manual failover completed"
+2026-01-17T10:44:50Z INFO node=redis-replica blocked_clients=2 replication_lag_s=1 cpu_pct=49 message="healthy after failover"

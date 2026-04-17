@@ -1,0 +1,10 @@
+2026-01-17T10:37:44Z INFO request_id=pay-2001 op=charge status=ok latency_ms=165 dependency=cart
+2026-01-17T10:38:49Z INFO request_id=pay-2002 op=charge status=ok latency_ms=201 dependency=cart
+2026-01-17T10:39:07Z WARN request_id=pay-2003 op=charge latency_ms=480 dependency=cart message="cart session lookup slow"
+2026-01-17T10:39:56Z WARN request_id=pay-2004 op=charge latency_ms=1330 dependency=cart message="retrying cart session fetch"
+2026-01-17T10:40:17Z ERROR request_id=pay-2005 op=charge status=error code=CART_TIMEOUT latency_ms=2410 dependency=cart message="cart session unavailable"
+2026-01-17T10:41:08Z ERROR request_id=pay-2006 op=charge status=error code=CART_TIMEOUT latency_ms=2890 dependency=cart message="cart session unavailable"
+2026-01-17T10:41:52Z ERROR request_id=pay-2007 op=charge status=error code=CART_TIMEOUT latency_ms=3011 dependency=cart message="cart session unavailable"
+2026-01-17T10:42:22Z ERROR request_id=pay-2008 op=charge status=error code=CART_TIMEOUT latency_ms=2988 dependency=cart message="cart session unavailable"
+2026-01-17T10:43:44Z WARN request_id=pay-2009 op=charge status=ok latency_ms=1710 dependency=cart message="retries succeeded"
+2026-01-17T10:45:02Z INFO request_id=pay-2010 op=charge status=ok latency_ms=244 dependency=cart

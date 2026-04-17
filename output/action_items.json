@@ -1,0 +1,30 @@
+[
+  {
+    "task": "Audit redis persistence and disk I/O settings around bgsave stalls.",
+    "priority": "P0",
+    "owner": "data-platform",
+    "evidence": [
+      "logs/redis-cache.log:L4-L7",
+      "chat.txt:L10-L11"
+    ]
+  },
+  {
+    "task": "Add alert correlation for REDIS_TIMEOUT -> CART_TIMEOUT -> gateway 504 chain.",
+    "priority": "P1",
+    "owner": "platform",
+    "evidence": [
+      "logs/cart.log:L5-L8",
+      "logs/payments.log:L5-L8",
+      "logs/api-gateway.log:L5-L7"
+    ]
+  },
+  {
+    "task": "Review checkout failover playbook and automate safe redis failover validation.",
+    "priority": "P1",
+    "owner": "data-platform",
+    "evidence": [
+      "runbook.md:L18-L20",
+      "chat.txt:L10-L12"
+    ]
+  }
+]

@@ -1,0 +1,14 @@
+[2026-01-17 10:39:22] maya (oncall-sre): seeing checkout latency climb on the dashboard, investigating
+[2026-01-17 10:39:44] leo (payments): payment charge retries are stacking up, looks like cart session fetch is slow
+[2026-01-17 10:40:03] nina (support): merchants reporting checkout failures in EU and US regions
+[2026-01-17 10:40:29] maya (oncall-sre): api-gateway and payments alerts fired, paging app oncall
+[2026-01-17 10:40:57] sam (cart): cart logs show repeated REDIS_TIMEOUT on get_session
+[2026-01-17 10:41:14] leo (payments): confirming failures mostly CART_TIMEOUT, not processor decline errors
+[2026-01-17 10:41:36] maya (oncall-sre): redis primary has blocked clients and replication lag during bgsave
+[2026-01-17 10:41:54] ivy (product): FYI this is hitting checkout conversion hard
+[2026-01-17 10:42:11] maya (oncall-sre): following runbook, declare SEV-1 if checkout broadly unavailable >10 percent error rate
+[2026-01-17 10:42:33] sam (cart): proposing manual redis failover, no code deploys in last 2 hours
+[2026-01-17 10:43:02] maya (oncall-sre): approved, failing over redis now
+[2026-01-17 10:43:48] leo (payments): payment success recovering, latency still elevated but charge path works again
+[2026-01-17 10:44:22] nina (support): merchant complaints slowing down
+[2026-01-17 10:45:11] maya (oncall-sre): resolving incident, monitor for 15 minutes

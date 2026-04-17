@@ -1,0 +1,10 @@
+2026-01-17T10:37:31Z INFO request_id=cart-3001 op=get_session status=ok latency_ms=82 backend=redis-cache
+2026-01-17T10:38:50Z INFO request_id=cart-3002 op=get_session status=ok latency_ms=94 backend=redis-cache
+2026-01-17T10:39:02Z WARN request_id=cart-3003 op=get_session latency_ms=420 backend=redis-cache message="cache latency elevated"
+2026-01-17T10:39:48Z WARN request_id=cart-3004 op=get_session latency_ms=990 backend=redis-cache message="waiting on redis response"
+2026-01-17T10:40:11Z ERROR request_id=cart-3005 op=get_session status=error code=REDIS_TIMEOUT latency_ms=1820 backend=redis-cache message="session fetch timed out"
+2026-01-17T10:40:52Z ERROR request_id=cart-3006 op=get_session status=error code=REDIS_TIMEOUT latency_ms=1910 backend=redis-cache message="session fetch timed out"
+2026-01-17T10:41:20Z ERROR request_id=cart-3007 op=get_session status=error code=REDIS_TIMEOUT latency_ms=2011 backend=redis-cache message="session fetch timed out"
+2026-01-17T10:42:05Z ERROR request_id=cart-3008 op=get_session status=error code=REDIS_TIMEOUT latency_ms=2055 backend=redis-cache message="session fetch timed out"
+2026-01-17T10:42:40Z WARN request_id=cart-3009 op=get_session status=ok latency_ms=1320 backend=redis-cache message="response slow"
+2026-01-17T10:45:00Z INFO request_id=cart-3010 op=get_session status=ok latency_ms=133 backend=redis-cache
