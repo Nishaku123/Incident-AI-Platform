@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Incident History</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-slate-100 min-h-screen">
+
+    <div class="max-w-7xl mx-auto py-10 px-6">
+
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-700 to-blue-800 rounded-3xl p-10 text-white shadow-2xl mb-10">
+
+            <h1 class="text-5xl font-bold mb-4">
+                Incident History Dashboard
+            </h1>
+
+            <p class="text-blue-100 text-lg">
+                Previously analyzed incidents stored in SQLite database.
+            </p>
+
+            <a
+               href="/"
+               class="inline-block mt-6 bg-white text-blue-700 font-bold px-6 py-3 rounded-2xl shadow-lg hover:bg-slate-100 transition duration-300"
+            >
+                Back to Upload Page
+            </a>
+
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+            <div class="overflow-x-auto">
+
+                <table class="min-w-full">
+
+                    <thead class="bg-slate-900 text-white">
+
+                        <tr>
+
+                            <th class="px-6 py-5 text-left">
+                                ID
+                            </th>
+
+                            <th class="px-6 py-5 text-left">
+                                Severity
+                            </th>
+
+                            <th class="px-6 py-5 text-left">
+                                Root Cause
+                            </th>
+
+                            <th class="px-6 py-5 text-left">
+                                Start Time
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for incident in incidents %}
+
+                        <tr class="border-b hover:bg-slate-50 transition duration-200">
+
+                            <td class="px-6 py-5 font-semibold">
+                                {{ incident[0] }}
+                            </td>
+
+                            <td class="px-6 py-5">
+
+                                {% if incident[1] == "SEV-1" %}
+
+                                    <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-bold">
+                                        {{ incident[1] }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-bold">
+                                        {{ incident[1] }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td class="px-6 py-5 text-slate-700">
+                                {{ incident[2] }}
+                            </td>
+
+                            <td class="px-6 py-5 text-slate-600">
+                                {{ incident[3] }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

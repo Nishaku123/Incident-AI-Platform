@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Incident Report</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-slate-100 min-h-screen">
+
+    <div class="max-w-7xl mx-auto py-10 px-6">
+
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-3xl p-10 text-white shadow-2xl mb-8">
+
+            <h1 class="text-5xl font-bold mb-4">
+                Incident Analysis Report
+            </h1>
+
+            <p class="text-blue-100 text-lg">
+                AI-generated incident investigation with evidence-based reasoning.
+            </p>
+
+        </div>
+
+        <!-- Download Buttons -->
+        <div class="flex flex-wrap gap-4 mb-8">
+
+            <a
+                href="/download/report"
+                class="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-6 py-4 rounded-2xl shadow-lg transition duration-300"
+            >
+                Download Incident Report
+            </a>
+
+            <a
+                href="/download/actions"
+                class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-4 rounded-2xl shadow-lg transition duration-300"
+            >
+                Download Action Items JSON
+            </a>
+
+        </div>
+
+        <!-- Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-l-8 border-blue-600">
+
+                <h2 class="text-slate-500 font-semibold mb-2">
+                    Timeline Accuracy
+                </h2>
+
+                <p class="text-3xl font-bold text-slate-800">
+                    {{ metrics.timeline_accuracy }}
+                </p>
+
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-l-8 border-emerald-600">
+
+                <h2 class="text-slate-500 font-semibold mb-2">
+                    Evidence Coverage
+                </h2>
+
+                <p class="text-3xl font-bold text-slate-800">
+                    {{ metrics.evidence_coverage }}
+                </p>
+
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-l-8 border-red-600">
+
+                <h2 class="text-slate-500 font-semibold mb-2">
+                    Hallucination Rate
+                </h2>
+
+                <p class="text-3xl font-bold text-slate-800">
+                    {{ metrics.hallucination_rate }}
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- Report -->
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+            <div class="bg-slate-900 px-8 py-5 text-white text-2xl font-bold">
+                Incident Report
+            </div>
+
+            <div class="p-8">
+
+                <div class="bg-slate-950 text-slate-200 rounded-2xl p-8 overflow-x-auto whitespace-pre-wrap leading-8 text-sm shadow-inner">
+                    {{ report }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
