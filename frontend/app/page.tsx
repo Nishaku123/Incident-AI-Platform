@@ -1,389 +1,189 @@
-'use client'
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  'http://127.0.0.1:8000'
 
-import { useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useDropzone } from 'react-dropzone'
-import {
-  Upload,
-  FileJson,
-  FileSpreadsheet,
-  MessageSquare,
-  FileCode,
-  FileText,
-  CheckCircle,
-  Loader2,
-  History,
-  Sparkles,
-  ArrowRight,
-  AlertCircle,
-  X
-} from 'lucide-react'
-import { analyzeIncident } from '@/services/api'
-
-type FileType = 'alerts.json' | 'metrics.csv' | 'chat.txt' | 'runbook.md' | 'logs'
-
-interface UploadFile {
-  id: string
-  file: File
-  type: FileType
-  progress: number
-  status: 'pending' | 'uploading' | 'success' | 'error'
+export interface HistoryIncident {
+  incident_id: string
+  title: string
+  severity: string
+  status: string
+  created_at: string
+  duration?: string
 }
 
-const fileTypes: {
-  type: FileType
-  label: string
-  icon: any
-  color: string
-  accept: string
-}[] = [
-  {
-    type: 'alerts.json',
-    label: 'Alerts JSON',
-    icon: FileJson,
-    color: 'from-blue-500 to-cyan-500',
-    accept: '.json'
-  },
-  {
-    type: 'metrics.csv',
-    label: 'Metrics CSV',
-    icon: FileSpreadsheet,
-    color: 'from-green-500 to-emerald-500',
-    accept: '.csv'
-  },
-  {
-    type: 'chat.txt',
-    label: 'Chat Transcript',
-    icon: MessageSquare,
-    color: 'from-purple-500 to-pink-500',
-    accept: '.txt'
-  },
-  {
-    type: 'runbook.md',
-    label: 'Runbook MD',
-    icon: FileCode,
-    color: 'from-orange-500 to-red-500',
-    accept: '.md'
-  },
-  {
-    type: 'logs',
-    label: 'Log Files',
-    icon: FileText,
-    color: 'from-gray-500 to-gray-600',
-    accept: '.log,.txt'
+export interface AnalysisResponse {
+  incident_id: string
+  severity: string
+  root_cause: string
+  impact: {
+    users_affected: number
+    estimated_loss: number
+    mttr: string
   }
-]
-
-export default function HomePage() {
-  const router = useRouter()
-
-  const [files, setFiles] = useState<UploadFile[]>([])
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const onDrop = useCallback((acceptedFiles: File[], fileType: FileType) => {
-    const newFiles: UploadFile[] = acceptedFiles.map((file) => ({
-      id: crypto.randomUUID(),
-      file,
-      type: fileType,
-      progress: 0,
-      status: 'pending'
-    }))
-
-    setFiles((prev) => [...prev, ...newFiles])
-    setError(null)
-
-    newFiles.forEach((f) => simulateUpload(f.id))
-  }, [])
-
-  const simulateUpload = (fileId: string) => {
-    let progress = 0
-
-    const interval = setInterval(() => {
-      progress += 10
-
-      setFiles((prev) =>
-        prev.map((f) =>
-          f.id === fileId
-            ? {
-                ...f,
-                progress,
-                status: progress === 100 ? 'success' : 'uploading'
-              }
-            : f
-        )
-      )
-
-      if (progress === 100) {
-        clearInterval(interval)
-      }
-    }, 150)
+  affected_services: string[]
+  metrics: {
+    timeline_accuracy: number
+    evidence_coverage: number
+    hallucination_rate: number
   }
+  timeline: {
+    time: string
+    event: string
+    severity: string
+  }[]
+  report_markdown: string
+  action_items: {
+    id: number
+    title: string
+    priority: string
+  }[]
+}
 
-  const removeFile = (id: string) => {
-    setFiles((prev) => prev.filter((f) => f.id !== id))
-  }
+export interface IncidentFiles {
+  alerts: File
+  metrics: File
+  chat: File
+  runbook: File
+  logs: File[]
+}
 
-  const handleAnalyze = async () => {
-    const alertsFile = files.find(
-      (f) => f.type === 'alerts.json' && f.status === 'success'
-    )?.file
-
-    const metricsFile = files.find(
-      (f) => f.type === 'metrics.csv' && f.status === 'success'
-    )?.file
-
-    const chatFile = files.find(
-      (f) => f.type === 'chat.txt' && f.status === 'success'
-    )?.file
-
-    const runbookFile = files.find(
-      (f) => f.type === 'runbook.md' && f.status === 'success'
-    )?.file
-
-    const logFiles = files
-      .filter((f) => f.type === 'logs' && f.status === 'success')
-      .map((f) => f.file)
-
-    if (!alertsFile || !metricsFile || !chatFile || !runbookFile || logFiles.length === 0) {
-      setError(
-        'Please upload alerts.json, metrics.csv, chat.txt, runbook.md, and at least one log file.'
-      )
-      return
-    }
-
-    setIsAnalyzing(true)
-    setError(null)
+async function handleResponse(
+  response: Response
+) {
+  if (!response.ok) {
+    let errorMessage =
+      'Something went wrong'
 
     try {
-      const payload = {
-        alerts: alertsFile,
-        metrics: metricsFile,
-        chat: chatFile,
-        runbook: runbookFile,
-        logs: logFiles
+      const errorData =
+        await response.json()
+
+      errorMessage =
+        errorData.detail ||
+        errorMessage
+    } catch {
+      try {
+        errorMessage =
+          await response.text()
+      } catch {
+        errorMessage =
+          'Server error'
       }
-
-      const result = await analyzeIncident(payload)
-
-      router.push(`/results?id=${result.incident_id}`)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Analysis failed')
-      setIsAnalyzing(false)
     }
+
+    throw new Error(errorMessage)
   }
 
-  const DropzoneCard = ({
-    type,
-    label,
-    icon: Icon,
-    color,
-    accept
-  }: (typeof fileTypes)[0]) => {
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-      onDrop: (uploadedFiles) => onDrop(uploadedFiles, type),
-      multiple: type === 'logs'
-    })
+  return response.json()
+}
 
-    return (
-      <motion.div
-        whileHover={{ scale: 1.02, y: -4 }}
-        transition={{ type: 'spring', stiffness: 300 }}
-        {...getRootProps()}
-        className={`cursor-pointer rounded-xl p-6 border transition-all duration-300 ${
-          isDragActive
-            ? 'border-blue-500 bg-blue-500/10'
-            : 'border-gray-700 bg-gray-900/50 hover:border-gray-600 hover:bg-gray-900/80'
-        }`}
-      >
-        <input {...getInputProps()} />
+export async function analyzeIncident(
+  files: IncidentFiles
+): Promise<AnalysisResponse> {
+  const formData = new FormData()
 
-        <div
-          className={`w-12 h-12 rounded-lg bg-gradient-to-br ${color} bg-opacity-20 flex items-center justify-center mb-4`}
-        >
-          <Icon className="w-6 h-6 text-white" />
-        </div>
+  // MUST MATCH FASTAPI FIELD NAMES
+  formData.append(
+    'alerts',
+    files.alerts
+  )
 
-        <h3 className="font-semibold text-gray-200">{label}</h3>
+  formData.append(
+    'metrics',
+    files.metrics
+  )
 
-        <p className="text-sm text-gray-500 mt-1">
-          {type === 'logs' ? 'Upload multiple .log files' : `Upload ${accept}`}
-        </p>
+  formData.append(
+    'chat',
+    files.chat
+  )
 
-        <p className="text-xs text-gray-600 mt-3">
-          {isDragActive ? 'Drop files here...' : 'Click or drag & drop'}
-        </p>
-      </motion.div>
+  formData.append(
+    'runbook',
+    files.runbook
+  )
+
+  files.logs.forEach((log) => {
+    formData.append(
+      'logs',
+      log
     )
-  }
+  })
 
-  const allSuccess =
-    files.length > 0 && files.every((f) => f.status === 'success')
+  const response = await fetch(
+    `${API_BASE_URL}/analyze`,
+    {
+      method: 'POST',
+      body: formData
+    }
+  )
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 blur-3xl" />
+  return handleResponse(response)
+}
 
-        <div className="relative px-8 pt-12 pb-16 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 mb-6">
-              <Sparkles className="w-4 h-4 text-blue-400" />
-              <span className="text-sm text-blue-400">
-                AI-Powered Incident Response
-              </span>
-            </div>
+export async function getIncidentResult(
+  incidentId: string
+): Promise<AnalysisResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}/results/${incidentId}`
+  )
 
-            <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-gray-100 to-gray-400 bg-clip-text text-transparent">
-              Analyze incidents in
-              <br />
-              <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                seconds, not hours
-              </span>
-            </h1>
+  return handleResponse(response)
+}
 
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Upload your incident artifacts and let our AI identify root
-              causes and generate comprehensive reports.
-            </p>
-          </motion.div>
-        </div>
-      </div>
+export async function getIncidentHistory(): Promise<
+  HistoryIncident[]
+> {
+  const response = await fetch(
+    `${API_BASE_URL}/history`
+  )
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 pb-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          {fileTypes.map((ft) => (
-            <DropzoneCard key={ft.type} {...ft} />
-          ))}
-        </div>
+  const data =
+    await handleResponse(response)
 
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 mb-6 flex items-center gap-3"
-          >
-            <AlertCircle className="w-5 h-5 text-red-400" />
-            <span className="text-red-300">{error}</span>
-          </motion.div>
-        )}
+  return data.map(
+    (incident: any) => ({
+      incident_id:
+        incident.incident_id ||
+        'Unknown',
 
-        {files.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl bg-gray-900/50 border border-gray-700 p-6 mb-8"
-          >
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <Upload className="w-4 h-4 text-blue-400" />
-              Upload Queue ({files.length})
-            </h3>
+      title:
+        incident.title ||
+        'AI Incident Analysis',
 
-            <div className="space-y-3">
-              <AnimatePresence>
-                {files.map((file) => {
-                  const ft = fileTypes.find((f) => f.type === file.type)!
-                  const Icon = ft.icon
+      severity:
+        incident.severity ||
+        'CRITICAL',
 
-                  return (
-                    <motion.div
-                      key={file.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-gray-800/30 border border-gray-700"
-                    >
-                      <div
-                        className={`w-8 h-8 rounded bg-gradient-to-br ${ft.color} bg-opacity-20 flex items-center justify-center`}
-                      >
-                        <Icon className="w-4 h-4 text-white" />
-                      </div>
+      status:
+        incident.status ||
+        'resolved',
 
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium">
-                            {file.file.name}
-                          </span>
+      created_at:
+        incident.created_at ||
+        new Date().toISOString(),
 
-                          <span className="text-xs text-gray-500">
-                            {(file.file.size / 1024).toFixed(1)} KB
-                          </span>
-                        </div>
+      duration:
+        incident.duration ||
+        'N/A'
+    })
+  )
+}
 
-                        <div className="w-full h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${file.progress}%` }}
-                            className={`h-full rounded-full bg-gradient-to-r ${ft.color}`}
-                          />
-                        </div>
-                      </div>
+export function downloadReport(
+  incidentId: string
+) {
+  window.open(
+    `${API_BASE_URL}/download/report/${incidentId}`,
+    '_blank'
+  )
+}
 
-                      <div className="w-8 flex justify-center">
-                        {file.status === 'success' && (
-                          <CheckCircle className="w-5 h-5 text-green-400" />
-                        )}
-
-                        {file.status === 'uploading' && (
-                          <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
-                        )}
-                      </div>
-
-                      <button
-                        onClick={() => removeFile(file.id)}
-                        className="text-gray-500 hover:text-red-400 transition-colors"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </motion.div>
-                  )
-                })}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        )}
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleAnalyze}
-            disabled={!allSuccess || isAnalyzing}
-            className={`px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 justify-center ${
-              allSuccess && !isAnalyzing
-                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40'
-                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-            }`}
-          >
-            {isAnalyzing ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Analyzing...
-              </>
-            ) : (
-              <>
-                <ArrowRight className="w-5 h-5" />
-                Analyze Incident
-              </>
-            )}
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => router.push('/history')}
-            className="px-8 py-3 rounded-xl font-semibold border border-gray-700 hover:border-gray-600 hover:bg-gray-800/50 transition-all duration-300 flex items-center gap-2 justify-center"
-          >
-            <History className="w-5 h-5" />
-            View Incident History
-          </motion.button>
-        </div>
-      </div>
-    </div>
+export function downloadActions(
+  incidentId: string
+) {
+  window.open(
+    `${API_BASE_URL}/download/actions/${incidentId}`,
+    '_blank'
   )
 }
