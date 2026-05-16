@@ -1,1 +1,5 @@
 # Standard library only. LangGraph is optional for future extension.
+uvicorn
+fastapi
+python-multipart
+uvicorn
