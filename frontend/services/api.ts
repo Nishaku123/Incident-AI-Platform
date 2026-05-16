@@ -39,9 +39,30 @@ export interface AnalysisResponse {
   }[]
 }
 
+export interface IncidentFiles {
+  alerts: File
+  metrics: File
+  chat: File
+  runbook: File
+  logs: File[]
+}
+
 export async function analyzeIncident(
-  formData: FormData
+  files: IncidentFiles
 ): Promise<AnalysisResponse> {
+  const formData = new FormData()
+
+  // IMPORTANT:
+  // These field names must exactly match FastAPI backend
+  formData.append('alerts', files.alerts)
+  formData.append('metrics', files.metrics)
+  formData.append('chat', files.chat)
+  formData.append('runbook', files.runbook)
+
+  files.logs.forEach((log) => {
+    formData.append('logs', log)
+  })
+
   const response = await fetch(
     `${API_BASE_URL}/analyze`,
     {
@@ -51,8 +72,11 @@ export async function analyzeIncident(
   )
 
   if (!response.ok) {
+    const errorText = await response.text()
+    console.error('Analyze API Error:', errorText)
+
     throw new Error(
-      'Failed to analyze incident'
+      `Failed to analyze incident: ${response.status}`
     )
   }
 
@@ -89,12 +113,25 @@ export async function getIncidentHistory(): Promise<HistoryIncident[]> {
   const data = await response.json()
 
   return data.map((incident: any) => ({
-    incident_id: incident.incident_id,
-    title: incident.title,
-    severity: incident.severity,
-    status: incident.status,
-    created_at: incident.created_at,
-    duration: 'N/A'
+    incident_id:
+      incident.incident_id ||
+      incident.id ||
+      'Unknown',
+    title:
+      incident.title ||
+      'AI Incident Analysis',
+    severity:
+      incident.severity ||
+      'CRITICAL',
+    status:
+      incident.status ||
+      'resolved',
+    created_at:
+      incident.created_at ||
+      new Date().toISOString(),
+    duration:
+      incident.duration ||
+      'N/A'
   }))
 }
 
