@@ -210,11 +210,17 @@ async def analyze_incident(request: Request):
             missing.append("logs")
 
         if missing:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Missing required files: {', '.join(missing)}"
-            )
+           print("FILES RECEIVED:")
+           print("alerts =", alerts)
+           print("metrics =", metrics)
+           print("chat =", chat)
+           print("runbook =", runbook)
+           print("logs =", logs)
 
+           raise HTTPException(
+              status_code=400,
+              detail=f"Missing required files: {', '.join(missing)}"
+           )
         incident_id = str(uuid.uuid4())[:8]
 
         incident_folder = os.path.join(UPLOAD_DIR, incident_id)
