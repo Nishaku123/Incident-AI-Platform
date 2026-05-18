@@ -64,3 +64,6 @@ npm run dev
 ## Architecture
 
 Frontend (Next.js) → FastAPI Backend → Incident Analysis Engine → Database Storage → Results Dashboard
+
+
+Live Demo Video available
