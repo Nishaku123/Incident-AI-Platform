@@ -1,189 +1,203 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  'http://127.0.0.1:8000'
+'use client'
 
-export interface HistoryIncident {
-  incident_id: string
-  title: string
-  severity: string
-  status: string
-  created_at: string
-  duration?: string
-}
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { analyzeIncident } from '@/services/api'
 
-export interface AnalysisResponse {
-  incident_id: string
-  severity: string
-  root_cause: string
-  impact: {
-    users_affected: number
-    estimated_loss: number
-    mttr: string
-  }
-  affected_services: string[]
-  metrics: {
-    timeline_accuracy: number
-    evidence_coverage: number
-    hallucination_rate: number
-  }
-  timeline: {
-    time: string
-    event: string
-    severity: string
-  }[]
-  report_markdown: string
-  action_items: {
-    id: number
-    title: string
-    priority: string
-  }[]
-}
-
-export interface IncidentFiles {
-  alerts: File
-  metrics: File
-  chat: File
-  runbook: File
+type UploadedFiles = {
+  alerts?: File
+  metrics?: File
+  chat?: File
+  runbook?: File
   logs: File[]
 }
 
-async function handleResponse(
-  response: Response
-) {
-  if (!response.ok) {
-    let errorMessage =
-      'Something went wrong'
+export default function HomePage() {
+  const router = useRouter()
 
-    try {
-      const errorData =
-        await response.json()
-
-      errorMessage =
-        errorData.detail ||
-        errorMessage
-    } catch {
-      try {
-        errorMessage =
-          await response.text()
-      } catch {
-        errorMessage =
-          'Server error'
-      }
-    }
-
-    throw new Error(errorMessage)
-  }
-
-  return response.json()
-}
-
-export async function analyzeIncident(
-  files: IncidentFiles
-): Promise<AnalysisResponse> {
-  const formData = new FormData()
-
-  // MUST MATCH FASTAPI FIELD NAMES
-  formData.append(
-    'alerts',
-    files.alerts
-  )
-
-  formData.append(
-    'metrics',
-    files.metrics
-  )
-
-  formData.append(
-    'chat',
-    files.chat
-  )
-
-  formData.append(
-    'runbook',
-    files.runbook
-  )
-
-  files.logs.forEach((log) => {
-    formData.append(
-      'logs',
-      log
-    )
+  const [files, setFiles] = useState<UploadedFiles>({
+    logs: []
   })
 
-  const response = await fetch(
-    `${API_BASE_URL}/analyze`,
-    {
-      method: 'POST',
-      body: formData
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleFileChange = (
+    type:
+      | 'alerts'
+      | 'metrics'
+      | 'chat'
+      | 'runbook'
+      | 'logs',
+    fileList: FileList | null
+  ) => {
+    if (!fileList || fileList.length === 0)
+      return
+
+    if (type === 'logs') {
+      setFiles((prev) => ({
+        ...prev,
+        logs: Array.from(fileList)
+      }))
+    } else {
+      setFiles((prev) => ({
+        ...prev,
+        [type]: fileList[0]
+      }))
     }
-  )
+  }
 
-  return handleResponse(response)
-}
+  const handleAnalyze = async () => {
+    try {
+      setError('')
+      setLoading(true)
 
-export async function getIncidentResult(
-  incidentId: string
-): Promise<AnalysisResponse> {
-  const response = await fetch(
-    `${API_BASE_URL}/results/${incidentId}`
-  )
+      if (
+        !files.alerts ||
+        !files.metrics ||
+        !files.chat ||
+        !files.runbook ||
+        files.logs.length === 0
+      ) {
+        setError(
+          'Please upload all required files.'
+        )
+        return
+      }
 
-  return handleResponse(response)
-}
+      const result =
+        await analyzeIncident({
+          alerts: files.alerts,
+          metrics: files.metrics,
+          chat: files.chat,
+          runbook: files.runbook,
+          logs: files.logs
+        })
 
-export async function getIncidentHistory(): Promise<
-  HistoryIncident[]
-> {
-  const response = await fetch(
-    `${API_BASE_URL}/history`
-  )
+      router.push(
+        `/results?id=${result.incident_id}`
+      )
+    } catch (err: any) {
+      console.error(err)
+      setError(
+        err.message ||
+          'Failed to analyze incident'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const data =
-    await handleResponse(response)
+  return (
+    <main className="min-h-screen bg-black text-white p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-5xl font-bold mb-2">
+          RespondIQ
+        </h1>
 
-  return data.map(
-    (incident: any) => ({
-      incident_id:
-        incident.incident_id ||
-        'Unknown',
+        <p className="text-gray-400 mb-8">
+          AI Incident Platform
+        </p>
 
-      title:
-        incident.title ||
-        'AI Incident Analysis',
+        <div className="grid gap-4">
+          <div>
+            <label className="block mb-2">
+              alerts.json
+            </label>
+            <input
+              type="file"
+              accept=".json"
+              onChange={(e) =>
+                handleFileChange(
+                  'alerts',
+                  e.target.files
+                )
+              }
+            />
+          </div>
 
-      severity:
-        incident.severity ||
-        'CRITICAL',
+          <div>
+            <label className="block mb-2">
+              metrics.csv
+            </label>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) =>
+                handleFileChange(
+                  'metrics',
+                  e.target.files
+                )
+              }
+            />
+          </div>
 
-      status:
-        incident.status ||
-        'resolved',
+          <div>
+            <label className="block mb-2">
+              chat.txt
+            </label>
+            <input
+              type="file"
+              accept=".txt"
+              onChange={(e) =>
+                handleFileChange(
+                  'chat',
+                  e.target.files
+                )
+              }
+            />
+          </div>
 
-      created_at:
-        incident.created_at ||
-        new Date().toISOString(),
+          <div>
+            <label className="block mb-2">
+              runbook.md
+            </label>
+            <input
+              type="file"
+              accept=".md"
+              onChange={(e) =>
+                handleFileChange(
+                  'runbook',
+                  e.target.files
+                )
+              }
+            />
+          </div>
 
-      duration:
-        incident.duration ||
-        'N/A'
-    })
-  )
-}
+          <div>
+            <label className="block mb-2">
+              Log files
+            </label>
+            <input
+              type="file"
+              multiple
+              accept=".log,.txt"
+              onChange={(e) =>
+                handleFileChange(
+                  'logs',
+                  e.target.files
+                )
+              }
+            />
+          </div>
+        </div>
 
-export function downloadReport(
-  incidentId: string
-) {
-  window.open(
-    `${API_BASE_URL}/download/report/${incidentId}`,
-    '_blank'
-  )
-}
+        {error && (
+          <p className="text-red-500 mt-4">
+            {error}
+          </p>
+        )}
 
-export function downloadActions(
-  incidentId: string
-) {
-  window.open(
-    `${API_BASE_URL}/download/actions/${incidentId}`,
-    '_blank'
+        <button
+          onClick={handleAnalyze}
+          disabled={loading}
+          className="mt-8 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold"
+        >
+          {loading
+            ? 'Analyzing...'
+            : 'Analyze Incident'}
+        </button>
+      </div>
+    </main>
   )
 }
