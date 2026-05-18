@@ -252,7 +252,7 @@ export default function HomePage() {
           stiffness: 300
         }}
         {...getRootProps()}
-        className={`cursor-pointer rounded-xl p-6 border transition-all duration-300 min-h-[210px] ${
+        className={`cursor-pointer rounded-xl p-4 sm:p-6 border transition-all duration-300 min-h-[170px] sm:min-h-[210px] ${
           isDragActive
             ? 'border-blue-500 bg-blue-500/10'
             : selectedCount > 0
@@ -305,11 +305,11 @@ export default function HomePage() {
     files.some((f) => f.type === 'logs')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white">
+      <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white">
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 blur-3xl" />
 
-        <div className="relative px-8 pt-14 pb-16 text-center">
+        <div className="relative px-4 sm:px-6 md:px-8 pt-10 sm:pt-14 pb-12 sm:pb-16 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{
@@ -325,7 +325,7 @@ export default function HomePage() {
               </span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-5 bg-gradient-to-r from-gray-100 to-gray-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-5 bg-gradient-to-r from-gray-100 to-gray-400 bg-clip-text text-transparent">
               Analyze incidents in
               <br />
               <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
@@ -341,7 +341,7 @@ export default function HomePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pb-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
           {fileTypes.map((ft) => (
             <DropzoneCard
               key={ft.type}
@@ -411,7 +411,7 @@ export default function HomePage() {
                         opacity: 0,
                         x: 20
                       }}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-gray-800/30 border border-gray-700"
+                      className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-lg bg-gray-800/30 border border-gray-700"
                     >
                       <div
                         className={`w-8 h-8 rounded bg-gradient-to-br ${ft.color} flex items-center justify-center`}
@@ -421,7 +421,7 @@ export default function HomePage() {
 
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium">
+                          <span className="text-sm font-medium break-all">
                             {file.file.name}
                           </span>
 
@@ -474,7 +474,7 @@ export default function HomePage() {
             whileTap={{ scale: 0.95 }}
             onClick={handleAnalyze}
             disabled={!hasRequiredFiles || isAnalyzing}
-            className={`px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 justify-center ${
+            className={`w-full sm:w-auto px-6 sm:px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 justify-center ${
               hasRequiredFiles && !isAnalyzing
                 ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40'
                 : 'bg-gray-700 text-gray-400 cursor-not-allowed'
